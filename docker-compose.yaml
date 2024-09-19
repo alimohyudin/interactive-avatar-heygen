@@ -1,0 +1,11 @@
+version: "2"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: heygen-demo
+    restart: always
+    ports:
+      - "3000:3000"
