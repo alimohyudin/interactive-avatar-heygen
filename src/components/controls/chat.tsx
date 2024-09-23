@@ -98,7 +98,7 @@ export function Chat() {
 
     //stop()
     // if(!isAvatarSpeaking) return;
-    console.log("Stop talking now ", isAvatarSpeaking)
+    //console.log("Stop talking now ", isAvatarSpeaking)
     try {
       if (isAvatarTalkingVar)
         await avatar.current
