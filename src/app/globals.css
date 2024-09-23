@@ -57,3 +57,25 @@
     --ring: 212.7 26.8% 83.9;
   }
 }
+
+
+/* Audio Waves */
+/* Container to hold the audio waves */
+.wave-icons {
+  overflow: hidden; /* Ensure waves don't overflow the container */
+}
+
+.wave-icons.animate .wave-icon {
+  position: relative;
+  animation: moveLeft 1.5s infinite linear; /* Apply the animation */
+}
+
+@keyframes moveLeft {
+  0% {
+    transform: translateX(0); /* Start at the initial position */
+  }
+  100% {
+    transform: translateX(-20px); /* Move to the right */
+  }
+}
+/* End Audio Waves */
