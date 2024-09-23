@@ -75,7 +75,7 @@ export function Chat() {
     }
 
     const stopTalkCallback = (e: any) => {
-      console.log("Avatar stopped talking", e)
+      //console.log("Avatar stopped talking", e)
       setAvatarStoppedTalking(true)
     }
 
@@ -92,6 +92,7 @@ export function Chat() {
       return
     }
     //stop()
+    if(avatarStoppedTalking) return;
     await avatar.current
       .interrupt({ interruptRequest: { sessionId: sessionData?.sessionId } })
       .catch((e) => {
@@ -110,96 +111,124 @@ export function Chat() {
   }
 
   function startRecording() {
-    setInputText("")
+    setInputText("");
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        mediaRecorder.current = new MediaRecorder(stream)
+        mediaRecorder.current = new MediaRecorder(stream);
         mediaRecorder.current.ondataavailable = (event) => {
-          audioChunks.current.push(event.data)
-        }
+          audioChunks.current.push(event.data);
+        };
         mediaRecorder.current.onstop = () => {
           const audioBlob = new Blob(audioChunks.current, {
             type: "audio/wav",
-          })
-          audioChunks.current = []
-          //transcribeAudio(audioBlob);//enable to transcribe audio
-        }
-        mediaRecorder.current.start()
-        setRecording(true)
-
-        if (SpeechRecognition) {
-          setDebug("Starting SpeechRecognition")
-          const recognition = new SpeechRecognition()
-          recognition.continuous = true
-          recognition.interimResults = false
-
-          recognition.start()
-
-          recognition.onstart = () => {
-            setDebug("1- Speech recognition started")
-            console.log("started")
-            //setInputText('');
+          });
+          audioChunks.current = [];
+          // transcribeAudio(audioBlob); // Enable to transcribe audio
+        };
+        mediaRecorder.current.start();
+        setRecording(true);
+  
+        // Setup audio context for speech detection
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+  
+        const detectSpeech = () => {
+          analyser.getByteFrequencyData(dataArray);
+          
+          let isCalledHandleInterrupt = false;
+          let values = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            values += dataArray[i];
           }
+          const averageVolume = values / bufferLength;
+  
+          if (averageVolume > 30) { // Adjust the threshold value as needed
+            console.log("Speaking detected!");
+            setIsSpeaking(true);
 
-          recognition.onresult = (event: any) => {
-            /* setDebug(JSON.stringify(event.results[0]));
-            setInputText(event.results[0][0].transcript);
-
-            // Restart the recognition after receiving a result
-            recognition.stop(); // Stop current recognition session */
-            setDebug(JSON.stringify(event.results))
-            console.log("result", event.results)
-
-            //let text = inputText + " " + event.results[0][0].transcript;
-            //setInputText(text);
-            let text = ""
+            if(!isCalledHandleInterrupt && !avatarStoppedTalking) {
+              handleInterrupt();
+              isCalledHandleInterrupt = true;
+            }
+            
+          } else {
+            setIsSpeaking(false);
+          }
+  
+          requestAnimationFrame(detectSpeech);
+        };
+  
+        detectSpeech();
+  
+        if (SpeechRecognition) {
+          setDebug("Starting SpeechRecognition");
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = false;
+  
+          recognition.start();
+  
+          recognition.onstart = () => {
+            setDebug("1- Speech recognition started");
+            console.log("started");
+          };
+  
+          recognition.onresult = (event) => {
+            setDebug(JSON.stringify(event.results));
+            console.log("result", event.results);
+  
+            let text = "";
             for (let index = 0; index < event.results.length; index++) {
-              const result = event.results[index]
+              const result = event.results[index];
               if (result.isFinal) {
-                text += result[0].transcript
+                text += result[0].transcript;
               }
             }
-            setInputText(text)
-
+            setInputText(text);
+  
             // Reset the timeout whenever new results are detected
             if (speakingTimeout.current) {
-              handleInterrupt()
-              clearTimeout(speakingTimeout.current)
+              //handleInterrupt();
+              clearTimeout(speakingTimeout.current);
             }
-
+  
             // Indicate that the user is currently speaking
-            setIsSpeaking(true)
-
+            setIsSpeaking(true);
+  
             // Set a timeout to turn off "speaking" status after 2 seconds of silence
             speakingTimeout.current = setTimeout(() => {
-              setDebug("3- Speech recognition stopped due to silence")
-              setIsSpeaking(false)
+              setDebug("3- Speech recognition stopped due to silence");
+              setIsSpeaking(false);
               handleSpeak(text);
-              recognition.stop()
-            }, 2000) // Adjust this time (in milliseconds) to detect end of speaking
-          }
-
+              recognition.stop();
+            }, 2000); // Adjust this time (in milliseconds) to detect end of speaking
+          };
+  
           recognition.onend = () => {
-            setDebug("2- Restarting Speech recognition")
-            recognition.start() // Restart the recognition
-          }
-
-          recognition.onerror = (event: any) => {
-            setDebug("Speech recognition error: " + event.error)
-            console.error("Speech recognition error:", event.error)
-            //stopRecording();
-            //restartRecording();
-          }
+            setDebug("2- Restarting Speech recognition");
+            recognition.start(); // Restart the recognition
+          };
+  
+          recognition.onerror = (event) => {
+            setDebug("Speech recognition error: " + event.error);
+            console.error("Speech recognition error:", event.error);
+          };
         } else {
-          setDebug("Speech recognition is not supported in this browser")
+          setDebug("Speech recognition is not supported in this browser");
         }
       })
       .catch((error) => {
-        console.error("Error accessing microphone:", error)
-        setDebug("Error accessing microphone: " + error)
-      })
+        console.error("Error accessing microphone:", error);
+        setDebug("Error accessing microphone: " + error);
+      });
   }
+  
 
   useEffect(() => {
     //console.log("Media stream active:", mediaStreamActive)

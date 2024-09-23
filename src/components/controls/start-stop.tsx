@@ -11,6 +11,7 @@ import {
   avatarAtom,
   avatarIdAtom,
   debugAtom,
+  isAvatarSpeakingAtom,
   knowledgeBaseFileAtom,
   mediaCanvasRefAtom,
   mediaStreamActiveAtom,
@@ -34,6 +35,7 @@ export function StartStop() {
   const [voiceId, setVoiceId] = useAtom(voiceIdAtom)
   const [knowledgeBaseFile] = useAtom(knowledgeBaseFileAtom)
   const [knowledgeBase, setKnowledgeBase] = useState<string>("")
+  const [isAvatarSpeaking, setIsAvatarSpeaking] = useAtom(isAvatarSpeakingAtom)
   const [mediaStreamRef] = useAtom(mediaStreamRefAtom)
   const [mediaCanvasRef] = useAtom(mediaCanvasRefAtom)
   const [sessionData, setSessionData] = useAtom(sessionDataAtom) as [
