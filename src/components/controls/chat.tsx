@@ -37,6 +37,7 @@ const SpeechRecognition =
   (window.SpeechRecognition || window.webkitSpeechRecognition)
 
 export function Chat() {
+  let simpleVariable = false
   const [avatar] = useAtom(avatarAtom)
   const [inputText, setInputText] = useAtom(inputTextAtom)
   const [isSpeaking, setIsSpeaking] = useAtom(isSpeakingAtom)
@@ -48,7 +49,7 @@ export function Chat() {
   const [isLoadingChat, setIsLoadingChat] = useState(false)
 
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useAtom(isAvatarSpeakingAtom)
-  const [avatarStoppedTalking, setAvatarStoppedTalking] = useState(false)
+  //const [avatarStoppedTalking, setAvatarStoppedTalking] = useState(false)
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const audioChunks = useRef<Blob[]>([])
   const [recording, setRecording] = useState(false) // Track recording state
@@ -84,19 +85,6 @@ export function Chat() {
 
     //avatar.current.addEventHandler("avatar_start_talking", startTalkCallback)
     //avatar.current.addEventHandler("avatar_stop_talking", stopTalkCallback)
-
-    avatar.current.addEventHandler("avatar_start_talking", (e) => {
-      console.log("Avatar started talking", e)
-      setAvatarStoppedTalking(false)
-      console.log(avatarStoppedTalking)
-    })
-
-    avatar.current.addEventHandler("avatar_stop_talking", (e) => {
-      console.log("Avatar stopped talking", e)
-      //setIsAvatarSpeaking(false)
-      setAvatarStoppedTalking(true)
-      console.log(avatarStoppedTalking)
-    })
   }
 
   const sentenceBuffer = useRef("")
@@ -110,9 +98,9 @@ export function Chat() {
 
     //stop()
     // if(!isAvatarSpeaking) return;
-    console.log("Interrupting ", avatarStoppedTalking)
+    console.log("Stop talking now ", isAvatarSpeaking)
     try {
-      if (isAvatarSpeaking)
+      if (simpleVariable)
         await avatar.current
           .interrupt({
             interruptRequest: { sessionId: sessionData?.sessionId },
@@ -161,10 +149,9 @@ export function Chat() {
         const bufferLength = analyser.frequencyBinCount
         const dataArray = new Uint8Array(bufferLength)
 
-        const detectSpeech = () => {
+        const detectSpeech = async () => {
           analyser.getByteFrequencyData(dataArray)
 
-          let isCalledHandleInterrupt = false
           let values = 0
           for (let i = 0; i < bufferLength; i++) {
             values += dataArray[i]
@@ -223,6 +210,7 @@ export function Chat() {
             // Set a timeout to turn off "speaking" status after 2 seconds of silence
             speakingTimeout.current = setTimeout(() => {
               setDebug("3- Speech recognition stopped due to silence")
+              handleInterrupt()
               setIsSpeaking(false)
               handleSpeak(text)
               recognition.stop()
@@ -237,6 +225,7 @@ export function Chat() {
           recognition.onerror = (event) => {
             setDebug("Speech recognition error: " + event.error)
             console.error("Speech recognition error:", event.error)
+            restartRecording()
           }
         } else {
           setDebug("Speech recognition is not supported in this browser")
@@ -251,7 +240,19 @@ export function Chat() {
   useEffect(() => {
     //console.log("Media stream active:", mediaStreamActive)
     if (mediaStreamActive) {
+      handleSpeak("Introduce yourself.")
       startRecording()
+      avatar.current.addEventHandler("avatar_start_talking", (e) => {
+        console.log("Avatar started talking", e)
+        simpleVariable = true;
+        console.log(simpleVariable)
+      })
+
+      avatar.current.addEventHandler("avatar_stop_talking", (e) => {
+        console.log("Avatar stopped talking", e)
+        simpleVariable = false
+        console.log(simpleVariable)
+      })
     }
   }, [mediaStreamActive])
 

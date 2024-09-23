@@ -19,7 +19,7 @@ export const voiceIdAtom = atom<string>("")
 export const qualityAtom = atom<NewSessionRequestQualityEnum>("high")
 export const knowledgeBaseFileAtom = atom<string>("/knowledge/first-knowledge.txt")
 export const isSpeakingAtom = atom(false)
-export const isAvatarSpeakingAtom = atom(false)
+export const isAvatarSpeakingAtom = atom(true)
 export const mediaStreamRefAtom = atom<RefObject<HTMLVideoElement> | null>(null)
 export const mediaCanvasRefAtom = atom<RefObject<HTMLCanvasElement> | null>(
   null
