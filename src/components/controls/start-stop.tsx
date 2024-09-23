@@ -129,6 +129,7 @@ export function StartStop() {
     setSessionData(res)
     setStream(avatarRef.current.mediaStream)
     setSessionState("running")
+
   }
 
   async function stop() {

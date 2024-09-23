@@ -46,6 +46,7 @@ export function Chat() {
   const [providerModel, setProviderModel] = useAtom(providerModelAtom)
   const [isLoadingChat, setIsLoadingChat] = useState(false)
 
+  
   const [avatarStoppedTalking, setAvatarStoppedTalking] = useState(false)
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const audioChunks = useRef<Blob[]>([])
