@@ -37,7 +37,7 @@ const SpeechRecognition =
   (window.SpeechRecognition || window.webkitSpeechRecognition)
 
 export function Chat() {
-  let simpleVariable = false
+  let isAvatarTalkingVar = false
   const [avatar] = useAtom(avatarAtom)
   const [inputText, setInputText] = useAtom(inputTextAtom)
   const [isSpeaking, setIsSpeaking] = useAtom(isSpeakingAtom)
@@ -100,7 +100,7 @@ export function Chat() {
     // if(!isAvatarSpeaking) return;
     console.log("Stop talking now ", isAvatarSpeaking)
     try {
-      if (simpleVariable)
+      if (isAvatarTalkingVar)
         await avatar.current
           .interrupt({
             interruptRequest: { sessionId: sessionData?.sessionId },
@@ -244,14 +244,14 @@ export function Chat() {
       startRecording()
       avatar.current.addEventHandler("avatar_start_talking", (e) => {
         console.log("Avatar started talking", e)
-        simpleVariable = true;
-        console.log(simpleVariable)
+        isAvatarTalkingVar = true;
+        console.log(isAvatarTalkingVar)
       })
 
       avatar.current.addEventHandler("avatar_stop_talking", (e) => {
         console.log("Avatar stopped talking", e)
-        simpleVariable = false
-        console.log(simpleVariable)
+        isAvatarTalkingVar = false
+        console.log(isAvatarTalkingVar)
       })
     }
   }, [mediaStreamActive])
