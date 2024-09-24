@@ -1,8 +1,6 @@
 import { RefObject } from "react"
-import {
-  NewSessionData,
-  NewSessionRequestQualityEnum,
-  StreamingAvatarApi,
+import StreamingAvatar, {
+  AvatarQuality
 } from "@heygen/streaming-avatar"
 import { atom } from "jotai"
 
@@ -10,21 +8,20 @@ import { NavItem } from "./types"
 
 //Stream Atoms
 export const mediaStreamActiveAtom = atom<Boolean>(false)
-export const sessionDataAtom = atom<NewSessionData | undefined>(undefined)
 export const streamAtom = atom<MediaStream | undefined>(undefined)
 export const debugAtom = atom<string>("")
 export const inputTextAtom = atom<string>("")
 export const avatarIdAtom = atom<string>("")
 export const voiceIdAtom = atom<string>("1bd001e7e50f421d891986aad5158bc8")
-export const qualityAtom = atom<NewSessionRequestQualityEnum>("high")
+export const qualityAtom = atom<AvatarQuality>(AvatarQuality.High)
 export const knowledgeBaseFileAtom = atom<string>("/knowledge/first-knowledge.txt")
-export const isSpeakingAtom = atom(false)
+export const isUserSpeakingAtom = atom(false)
 export const isAvatarSpeakingAtom = atom(true)
 export const mediaStreamRefAtom = atom<RefObject<HTMLVideoElement> | null>(null)
 export const mediaCanvasRefAtom = atom<RefObject<HTMLCanvasElement> | null>(
   null
 )
-export const avatarAtom = atom<RefObject<StreamingAvatarApi> | undefined>(
+export const avatarAtom = atom<RefObject<StreamingAvatar> | undefined>(
   undefined
 )
 

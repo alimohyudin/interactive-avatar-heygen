@@ -14,7 +14,7 @@
     "@ai-sdk/mistral": "^0.0.22",
     "@ai-sdk/openai": "^0.0.36",
     "@ai-sdk/react": "^0.0.21",
-    "@heygen/streaming-avatar": "^1.0.14",
+    "@heygen/streaming-avatar": "^2.0.2",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
     "@radix-ui/react-icons": "^1.3.0",

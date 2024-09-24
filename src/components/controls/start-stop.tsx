@@ -1,24 +1,28 @@
 import { RefObject, useEffect, useRef, useState } from "react"
-import {
-  Configuration,
-  NewSessionData,
-  StreamingAvatarApi,
-  NewSessionRequestVoiceEmotionEnum
-} from "@heygen/streaming-avatar"
+//@ts-ignore
+import StreamingAvatar, { StreamingEvents, VoiceEmotion } from "@heygen/streaming-avatar"
+// import {
+//   Configuration,
+//   NewSessionData,
+//   StreamingAvatarApi,
+//   NewSessionRequestVoiceEmotionEnum
+// } from "@heygen/streaming-avatar"
 import { useAtom } from "jotai"
 import { MicIcon, PlayIcon, RefreshCcw, SquareIcon } from "lucide-react"
+
+//
 
 import {
   avatarAtom,
   avatarIdAtom,
   debugAtom,
   isAvatarSpeakingAtom,
+  isUserSpeakingAtom,
   knowledgeBaseFileAtom,
   mediaCanvasRefAtom,
   mediaStreamActiveAtom,
   mediaStreamRefAtom,
   qualityAtom,
-  sessionDataAtom,
   streamAtom,
   voiceIdAtom,
 } from "@/lib/atoms"
@@ -37,12 +41,10 @@ export function StartStop() {
   const [knowledgeBaseFile] = useAtom(knowledgeBaseFileAtom)
   const [knowledgeBase, setKnowledgeBase] = useState<string>("")
   const [isAvatarSpeaking, setIsAvatarSpeaking] = useAtom(isAvatarSpeakingAtom)
+  const [isUserSpeaking, setIsUserSpeaking] = useAtom(isUserSpeakingAtom)
   const [mediaStreamRef] = useAtom(mediaStreamRefAtom)
   const [mediaCanvasRef] = useAtom(mediaCanvasRefAtom)
-  const [sessionData, setSessionData] = useAtom(sessionDataAtom) as [
-    NewSessionData | undefined,
-    (sessionData: NewSessionData | undefined) => void,
-  ]
+  //const avatar = useAtom(avatarAtom);
   const [stream, setStream] = useAtom(streamAtom) as [
     MediaStream | undefined,
     (stream: MediaStream | undefined) => void,
@@ -50,10 +52,10 @@ export function StartStop() {
   const [, setDebug] = useAtom(debugAtom)
 
   const [avatar, setAvatar] = useAtom(avatarAtom) as [
-    { current: StreamingAvatarApi | undefined },
-    (value: { current: StreamingAvatarApi | undefined }) => void,
+    { current: StreamingAvatar | undefined },
+    (value: { current: StreamingAvatar | undefined }) => void,
   ]
-  const avatarRef = useRef<StreamingAvatarApi | undefined>()
+  const avatarRef = useRef<StreamingAvatar | undefined>()
   useEffect(() => {
     setAvatar(avatarRef)
   }, [setAvatar])
@@ -101,11 +103,15 @@ export function StartStop() {
     }
     const data = await response.json()
 
-    avatarRef.current = new StreamingAvatarApi(
-      new Configuration({
-        accessToken: data.data.data.token,
-      })
-    )
+    // avatarRef.current = new StreamingAvatarApi(
+    //   new Configuration({
+    //     accessToken: data.data.data.token,
+    //   })
+    // )
+    avatar.current = new StreamingAvatar({
+      token: data.data.data.token,
+
+    })
 
     let knowledgeData = ""
     if (knowledgeBaseFile) {
@@ -113,37 +119,55 @@ export function StartStop() {
       knowledgeData = await readKnowledgeBaseFromFile()
     }
 
+    avatar.current?.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
+      console.log("Avatar started talking", e)
+    })
+    avatar.current?.on(StreamingEvents.AVATAR_STOP_TALKING, (e) => {
+      console.log("Avatar stopped talking", e)
+    })
+    avatar.current?.on(StreamingEvents.STREAM_DISCONNECTED, () => {
+      console.log("Stream disconnected")
+      //endSession();
+    })
+    avatar.current?.on(StreamingEvents.STREAM_READY, (event) => {
+      console.log(">>>>> Stream ready:", event.detail)
+      setStream(event.detail)
+    })
+    avatar.current?.on(StreamingEvents.USER_START, (event) => {
+      console.log(">>>>> User started talking:", event)
+      setIsUserSpeaking(true);
+    })
+    avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
+      console.log(">>>>> User stopped talking:", event)
+      setIsUserSpeaking(false);
+    })
     //console.log("Avatar API initialized")
     //console.log("knowledgeBase:", knowledgeData)
-    const res = await avatarRef.current.createStartAvatar(
-      {
-        newSessionRequest: {
-          quality: quality, // low, medium, high
-          avatarName: avatarId,
-          //voice: { voiceId: voiceId },
-          knowledgeBase: knowledgeData,
-          voice: {
-            voiceId: voiceId,
-            rate: 1, // 0.5 ~ 1.5
-            emotion: NewSessionRequestVoiceEmotionEnum.Excited,
-          },
-        },
+    const res = await avatar.current.createStartAvatar({
+      quality: quality, // low, medium, high
+      avatarName: avatarId,
+      //voice: { voiceId: voiceId },
+      //knowledgeBase: knowledgeData,
+      knowledgeId: "hi",
+      voice: {
+        voiceId: voiceId,
+        rate: 1, // 0.5 ~ 1.5
+        emotion: VoiceEmotion.EXCITED, // neutral, happy, angry, sad
       },
-      setDebug
-    )
+    })
 
-    setSessionData(res)
-    setStream(avatarRef.current.mediaStream)
+    //setSessionData(res)
+    //setStream(avatarRef.current.mediaStream)
+    
+    await avatar.current?.startVoiceChat();
     setSessionState("running")
   }
 
   async function stop() {
     setSessionState("stopped")
     setMediaStreamActive(false)
-    await avatarRef.current!.stopAvatar(
-      { stopSessionRequest: { sessionId: sessionData?.sessionId } },
-      setDebug
-    )
+    await avatar.current?.stopAvatar();
+    //setStream(undefined);
   }
 
   return (

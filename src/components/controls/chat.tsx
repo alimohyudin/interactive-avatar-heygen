@@ -12,10 +12,10 @@ import {
   debugAtom,
   inputTextAtom,
   isAvatarSpeakingAtom,
-  isSpeakingAtom,
+  isUserSpeakingAtom,
   mediaStreamActiveAtom,
   providerModelAtom,
-  sessionDataAtom,
+  //sessionDataAtom,
 } from "@/lib/atoms"
 
 declare global {
@@ -33,8 +33,8 @@ export function Chat() {
   let isAvatarTalkingVar = false
   const [avatar] = useAtom(avatarAtom)
   const [inputText, setInputText] = useAtom(inputTextAtom)
-  const [isSpeaking, setIsSpeaking] = useAtom(isSpeakingAtom)
-  const [sessionData] = useAtom(sessionDataAtom)
+  const [isUserSpeaking, setIsUserSpeaking] = useAtom(isUserSpeakingAtom)
+  //const [sessionData] = useAtom(sessionDataAtom)
   const [mediaStreamActive] = useAtom(mediaStreamActiveAtom)
   const [, setDebug] = useAtom(debugAtom)
   const [chatMode, setChatMode] = useAtom(chatModeAtom)
@@ -48,7 +48,7 @@ export function Chat() {
   const [recording, setRecording] = useState(false) // Track recording state
   const speakingTimeout = useRef(null) // Timeout to track when speaking stops
 
-  async function handleSpeak(mytext) {
+  /* async function handleSpeak(mytext) {
     if (!avatar.current) {
       setDebug("Avatar API not initialized")
       return
@@ -79,11 +79,12 @@ export function Chat() {
     //avatar.current.addEventHandler("avatar_start_talking", startTalkCallback)
     //avatar.current.addEventHandler("avatar_stop_talking", stopTalkCallback)
   }
+ */
 
   const sentenceBuffer = useRef("")
   const processedSentences = useRef(new Set())
 
-  async function handleInterrupt() {
+  /* async function handleInterrupt() {
     if (!avatar.current) {
       setDebug("Avatar API not initialized")
       return
@@ -102,8 +103,8 @@ export function Chat() {
             setDebug(e.message)
           })
     } catch (e) {}
-  }
-  function stopRecording() {
+  } */
+  /* function stopRecording() {
     if (mediaRecorder.current) {
       mediaRecorder.current.stop()
       setRecording(false)
@@ -247,7 +248,7 @@ export function Chat() {
         console.log(isAvatarTalkingVar)
       })
     }
-  }, [mediaStreamActive])
+  }, [mediaStreamActive]) */
 
   return (
     <form>
@@ -257,10 +258,10 @@ export function Chat() {
             <p>{inputText}</p>
           </div>
           <div
-            className={`wave-icons ${isSpeaking ? "animate" : ""} flex max-w-[50px]`}
+            className={`wave-icons ${isUserSpeaking ? "animate" : ""} flex max-w-[50px]`}
           >
-            {isSpeaking && <img src="/images/streaming-listening.gif" />}
-            {!isSpeaking && <img src="/images/listening-idle.svg" />}
+            {isUserSpeaking && <img src="/images/streaming-listening.gif" />}
+            {!isUserSpeaking && <img src="/images/listening-idle.svg" />}
           </div>
 
           {/* <div className="flex w-full items-center">
