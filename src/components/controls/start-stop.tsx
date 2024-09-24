@@ -3,6 +3,7 @@ import {
   Configuration,
   NewSessionData,
   StreamingAvatarApi,
+  NewSessionRequestVoiceEmotionEnum
 } from "@heygen/streaming-avatar"
 import { useAtom } from "jotai"
 import { MicIcon, PlayIcon, RefreshCcw, SquareIcon } from "lucide-react"
@@ -119,8 +120,13 @@ export function StartStop() {
         newSessionRequest: {
           quality: quality, // low, medium, high
           avatarName: avatarId,
-          voice: { voiceId: voiceId },
+          //voice: { voiceId: voiceId },
           knowledgeBase: knowledgeData,
+          voice: {
+            voiceId: voiceId,
+            rate: 1, // 0.5 ~ 1.5
+            emotion: NewSessionRequestVoiceEmotionEnum.Excited,
+          },
         },
       },
       setDebug
