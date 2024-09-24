@@ -5,7 +5,7 @@ import {
   StreamingAvatarApi,
 } from "@heygen/streaming-avatar"
 import { useAtom } from "jotai"
-import { PlayIcon, RefreshCcw, SquareIcon, MicIcon } from "lucide-react"
+import { MicIcon, PlayIcon, RefreshCcw, SquareIcon } from "lucide-react"
 
 import {
   avatarAtom,
@@ -150,14 +150,14 @@ export function StartStop() {
           Start session
         </button> */}
         {sessionState == "stopped" && (
-          <Button onClick={grab} variant="secondary" size="lg">
+          <Button onClick={grab} variant="purple" size="lg">
             <PlayIcon className="size-4" />
             Start Session
           </Button>
         )}
 
         {sessionState == "initializing" && (
-          <Button onClick={grab} variant="secondary" size="lg">
+          <Button onClick={grab} variant="purple" size="lg">
             <PlayIcon className="size-4" />
             Initializing...
           </Button>
@@ -165,13 +165,13 @@ export function StartStop() {
 
         {sessionState == "running" && (
           <div className="flex gap-2">
-            <div className="flex rounded-3xl bg-white px-4 py-2 text-black justify-center items-center">
+            <div className="flex items-center justify-center rounded-3xl bg-[#7559ff] px-4 py-2 text-black text-white">
               <MicIcon className="size-4" />
               <Chat />
+              <Button onClick={stop} variant="purple" size="icon">
+                <SquareIcon className="size-4" />
+              </Button>
             </div>
-            <Button onClick={stop} variant="secondary" size="icon">
-              <SquareIcon className="size-4" />
-            </Button>
           </div>
         )}
       </div>

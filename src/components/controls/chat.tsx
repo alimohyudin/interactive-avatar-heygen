@@ -18,13 +18,6 @@ import {
   sessionDataAtom,
 } from "@/lib/atoms"
 
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
-import { Switch } from "../ui/switch"
-import { Textarea } from "../ui/textarea"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
-
 declare global {
   interface Window {
     SpeechRecognition: any
@@ -266,16 +259,8 @@ export function Chat() {
           <div
             className={`wave-icons ${isSpeaking ? "animate" : ""} flex max-w-[50px]`}
           >
-            <div className="flex">
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-              <AudioLines className="wave-icon size-4" />
-            </div>
+            {isSpeaking && <img src="/images/streaming-listening.gif" />}
+            {!isSpeaking && <img src="/images/listening-idle.svg" />}
           </div>
 
           {/* <div className="flex w-full items-center">
