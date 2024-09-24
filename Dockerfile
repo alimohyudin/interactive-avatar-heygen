@@ -12,8 +12,11 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+# Build the Next.js application
+RUN npm run build
+
 # Expose the application's port
 EXPOSE 3000
 
-# Start the application npm run dev
-CMD ["npm", "run", "dev"]
+# Start the application
+CMD ["npm", "start"]

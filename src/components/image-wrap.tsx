@@ -62,9 +62,7 @@ export default function ImageWrap() {
         src={
           avatarId === ""
             ? "/default.png"
-            : publicAvatars.find((avatar) => avatar.pose_id === avatarId)[
-                "normal_preview"
-              ]
+            : ""
         }
         className={cn("inline-block max-w-full", removeBG ? "hidden" : "flex")}
         alt="default image"

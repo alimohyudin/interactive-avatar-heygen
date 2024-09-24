@@ -64,7 +64,7 @@
 .wave-container {
   width: 106px;
   height: 40px;
-  background-image: url(https://static.heygen.ai/heygen/avatar/streaming-listening.gif);
+  background-image: url(/images/streaming-listening.gif);
   background-size: auto 100%;
   background-repeat: repeat-x;
   background-position: 0% 0px;
