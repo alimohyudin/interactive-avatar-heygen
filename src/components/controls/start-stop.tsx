@@ -148,7 +148,7 @@ export function StartStop() {
       avatarName: avatarId,
       //voice: { voiceId: voiceId },
       //knowledgeBase: knowledgeData,
-      knowledgeId: "hi",
+      knowledgeId: '0be4beeadcec4a4ba62d8945d5da2007',
       voice: {
         voiceId: voiceId,
         rate: 1, // 0.5 ~ 1.5
@@ -196,7 +196,7 @@ export function StartStop() {
         {sessionState == "running" && (
           <div className="flex gap-2">
             <div className="flex items-center justify-center rounded-3xl bg-[#7559ff] px-4 py-2 text-black text-white">
-              <MicIcon className="size-4" />
+              {/* <MicIcon className="size-4" /> */}
               <Chat />
               <Button onClick={stop} variant="purple" size="icon">
                 <SquareIcon className="size-4" />

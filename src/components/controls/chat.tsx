@@ -254,7 +254,7 @@ export function Chat() {
     <form>
       {true && (
         <div className="flex items-center gap-4">
-          <div className="min-w-[100px]">
+          <div className="">
             <p>{inputText}</p>
           </div>
           <div
