@@ -61,21 +61,13 @@
 
 /* Audio Waves */
 /* Container to hold the audio waves */
-.wave-icons {
-  overflow: hidden; /* Ensure waves don't overflow the container */
-}
-
-.wave-icons.animate .wave-icon {
-  position: relative;
-  animation: moveLeft 1.5s infinite linear; /* Apply the animation */
-}
-
-@keyframes moveLeft {
-  0% {
-    transform: translateX(0); /* Start at the initial position */
-  }
-  100% {
-    transform: translateX(-20px); /* Move to the right */
-  }
+.wave-container {
+  width: 106px;
+  height: 40px;
+  background-image: url(https://static.heygen.ai/heygen/avatar/streaming-listening.gif);
+  background-size: auto 100%;
+  background-repeat: repeat-x;
+  background-position: 0% 0px;
+  animation: 15s linear 0s infinite normal none running animation-1rnwzpd;
 }
 /* End Audio Waves */

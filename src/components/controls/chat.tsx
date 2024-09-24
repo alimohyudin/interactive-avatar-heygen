@@ -260,7 +260,7 @@ export function Chat() {
           <div
             className={`wave-icons ${isUserSpeaking ? "animate" : ""} flex max-w-[50px]`}
           >
-            {isUserSpeaking && <img src="/images/streaming-listening.gif" />}
+            {isUserSpeaking && <div className="wave-container"></div>}
             {!isUserSpeaking && <img src="/images/listening-idle.svg" />}
           </div>
 

@@ -16,6 +16,7 @@ import {
   avatarAtom,
   avatarIdAtom,
   debugAtom,
+  inputTextAtom,
   isAvatarSpeakingAtom,
   isUserSpeakingAtom,
   knowledgeBaseFileAtom,
@@ -35,6 +36,7 @@ export function StartStop() {
   const [mediaStreamActive, setMediaStreamActive] = useAtom(
     mediaStreamActiveAtom
   )
+  const [inputText, setInputText] = useAtom(inputTextAtom)
   const [quality, setQuality] = useAtom(qualityAtom)
   const [avatarId, setAvatarId] = useAtom(avatarIdAtom)
   const [voiceId, setVoiceId] = useAtom(voiceIdAtom)
@@ -76,18 +78,6 @@ export function StartStop() {
     }
   }, [mediaStreamRef, stream])
 
-  async function readKnowledgeBaseFromFile() {
-    let response = await fetch(knowledgeBaseFile)
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.statusText}`)
-    }
-
-    let text = await response.text()
-    //console.log("Reading knowledge base from file:", text)
-    return text
-    //await setKnowledgeBase('');
-  }
 
   async function grab() {
     setSessionState("initializing")
@@ -113,12 +103,6 @@ export function StartStop() {
 
     })
 
-    let knowledgeData = ""
-    if (knowledgeBaseFile) {
-      //console.log("Reading knowledge base from file:", knowledgeBaseFile)
-      knowledgeData = await readKnowledgeBaseFromFile()
-    }
-
     avatar.current?.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
       console.log("Avatar started talking", e)
     })
@@ -141,13 +125,16 @@ export function StartStop() {
       console.log(">>>>> User stopped talking:", event)
       setIsUserSpeaking(false);
     })
+    avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
+      console.log(">>>>> User talking message:", event)
+      console.log(event.detail.message)
+      setInputText(event.detail.message)
+    })
     //console.log("Avatar API initialized")
     //console.log("knowledgeBase:", knowledgeData)
     const res = await avatar.current.createStartAvatar({
       quality: quality, // low, medium, high
       avatarName: avatarId,
-      //voice: { voiceId: voiceId },
-      //knowledgeBase: knowledgeData,
       knowledgeId: '0be4beeadcec4a4ba62d8945d5da2007',
       voice: {
         voiceId: voiceId,
@@ -160,6 +147,9 @@ export function StartStop() {
     //setStream(avatarRef.current.mediaStream)
     
     await avatar.current?.startVoiceChat();
+    await avatar.current.speak({ text: "introduce yourself." }).catch((e) => {
+      setDebug(e.message);
+    });
     setSessionState("running")
   }
 
