@@ -2,7 +2,8 @@ import React, { RefObject, useEffect, useRef } from "react"
 import { useAtom } from "jotai"
 import { ChevronRightIcon } from "lucide-react"
 
-import { customBgPicAtom, debugAtom} from "@/lib/atoms"
+import { customBgPicAtom, debugAtom } from "@/lib/atoms"
+
 import { StartStop } from "./controls/start-stop"
 import ImageWrap from "./image-wrap"
 import VideoWrap from "./video-wrap"
@@ -13,7 +14,7 @@ function MediaPlayer() {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-1">
-      <StartStop />
+      {/* <StartStop /> */}
       <div
         className="relative flex justify-center overflow-hidden rounded-3xl border text-white"
         // [box-shadow:0_8px_34px_rgba(0,0,0,.5)]
@@ -29,10 +30,14 @@ function MediaPlayer() {
         <VideoWrap />
         <ImageWrap />
       </div>
-      <footer className="sticky bottom-0 mt-auto flex w-[500px] flex-row items-center rounded-md border py-4 font-mono text-sm">
+      {/* make the div go to bottom center */}
+      <div className="absolute bottom-8 px-4">
+        <StartStop />
+      </div>
+      {/* <footer className="sticky bottom-0 mt-auto flex w-[500px] flex-row items-center rounded-md border py-4 font-mono text-sm">
         <ChevronRightIcon className="h-4 w-4" />
         <p>{debug}</p>
-      </footer>
+      </footer> */}
     </div>
   )
 }

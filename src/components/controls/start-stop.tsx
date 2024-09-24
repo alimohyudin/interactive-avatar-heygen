@@ -5,25 +5,28 @@ import {
   StreamingAvatarApi,
 } from "@heygen/streaming-avatar"
 import { useAtom } from "jotai"
-import { PlayIcon, RefreshCcw, SquareIcon } from "lucide-react"
+import { PlayIcon, RefreshCcw, SquareIcon, MicIcon } from "lucide-react"
 
 import {
   avatarAtom,
   avatarIdAtom,
   debugAtom,
+  isAvatarSpeakingAtom,
+  knowledgeBaseFileAtom,
   mediaCanvasRefAtom,
   mediaStreamActiveAtom,
   mediaStreamRefAtom,
   qualityAtom,
-  knowledgeBaseFileAtom,
   sessionDataAtom,
   streamAtom,
   voiceIdAtom,
 } from "@/lib/atoms"
 
 import { Button } from "../ui/button"
+import { Chat } from "./chat"
 
 export function StartStop() {
+  const [sessionState, setSessionState] = useState("stopped")
   const [mediaStreamActive, setMediaStreamActive] = useAtom(
     mediaStreamActiveAtom
   )
@@ -32,6 +35,7 @@ export function StartStop() {
   const [voiceId, setVoiceId] = useAtom(voiceIdAtom)
   const [knowledgeBaseFile] = useAtom(knowledgeBaseFileAtom)
   const [knowledgeBase, setKnowledgeBase] = useState<string>("")
+  const [isAvatarSpeaking, setIsAvatarSpeaking] = useAtom(isAvatarSpeakingAtom)
   const [mediaStreamRef] = useAtom(mediaStreamRefAtom)
   const [mediaCanvasRef] = useAtom(mediaCanvasRefAtom)
   const [sessionData, setSessionData] = useAtom(sessionDataAtom) as [
@@ -70,19 +74,21 @@ export function StartStop() {
   }, [mediaStreamRef, stream])
 
   async function readKnowledgeBaseFromFile() {
-    let response = await fetch(knowledgeBaseFile);
+    let response = await fetch(knowledgeBaseFile)
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch: ${response.statusText}`);
+      throw new Error(`Failed to fetch: ${response.statusText}`)
     }
 
-    let text = await response.text();
-    console.log("Reading knowledge base from file:", text);
-    return text;
+    let text = await response.text()
+    //console.log("Reading knowledge base from file:", text)
+    return text
     //await setKnowledgeBase('');
   }
 
   async function grab() {
+    setSessionState("initializing")
+
     const response = await fetch("/api/grab", {
       method: "POST",
       headers: {
@@ -100,14 +106,14 @@ export function StartStop() {
       })
     )
 
-    let knowledgeData = '';
+    let knowledgeData = ""
     if (knowledgeBaseFile) {
-      console.log("Reading knowledge base from file:", knowledgeBaseFile)
+      //console.log("Reading knowledge base from file:", knowledgeBaseFile)
       knowledgeData = await readKnowledgeBaseFromFile()
     }
 
-    console.log("Avatar API initialized")
-    console.log("knowledgeBase:", knowledgeData)
+    //console.log("Avatar API initialized")
+    //console.log("knowledgeBase:", knowledgeData)
     const res = await avatarRef.current.createStartAvatar(
       {
         newSessionRequest: {
@@ -122,9 +128,11 @@ export function StartStop() {
 
     setSessionData(res)
     setStream(avatarRef.current.mediaStream)
+    setSessionState("running")
   }
 
   async function stop() {
+    setSessionState("stopped")
     setMediaStreamActive(false)
     await avatarRef.current!.stopAvatar(
       { stopSessionRequest: { sessionId: sessionData?.sessionId } },
@@ -134,7 +142,40 @@ export function StartStop() {
 
   return (
     <div className="relative space-x-1">
-      <Button onClick={grab} variant="ghost" size="icon">
+      <div>
+        {/* <button
+          className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+          onClick={() => setDebug(debug + 1)}
+        >
+          Start session
+        </button> */}
+        {sessionState == "stopped" && (
+          <Button onClick={grab} variant="secondary" size="lg">
+            <PlayIcon className="size-4" />
+            Start Session
+          </Button>
+        )}
+
+        {sessionState == "initializing" && (
+          <Button onClick={grab} variant="secondary" size="lg">
+            <PlayIcon className="size-4" />
+            Initializing...
+          </Button>
+        )}
+
+        {sessionState == "running" && (
+          <div className="flex gap-2">
+            <div className="flex rounded-3xl bg-white px-4 py-2 text-black justify-center items-center">
+              <MicIcon className="size-4" />
+              <Chat />
+            </div>
+            <Button onClick={stop} variant="secondary" size="icon">
+              <SquareIcon className="size-4" />
+            </Button>
+          </div>
+        )}
+      </div>
+      {/* <Button onClick={grab} variant="ghost" size="icon">
         <PlayIcon className="size-4" />
       </Button>
       <Button onClick={stop} variant="ghost" size="icon">
@@ -142,7 +183,7 @@ export function StartStop() {
       </Button>
       <Button onClick={stop} variant="ghost" size="icon">
         <RefreshCcw className="size-4" />
-      </Button>
+      </Button> */}
     </div>
   )
 }
