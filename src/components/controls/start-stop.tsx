@@ -138,16 +138,17 @@ export function StartStop() {
       knowledgeId: '0be4beeadcec4a4ba62d8945d5da2007',
       voice: {
         voiceId: voiceId,
-        rate: 1, // 0.5 ~ 1.5
-        emotion: VoiceEmotion.EXCITED, // neutral, happy, angry, sad
+        rate: 0.93, // 0.5 ~ 1.5
+        emotion: VoiceEmotion.SOOTHING, // neutral, happy, angry, sad
       },
+      language: "en",
     })
 
     //setSessionData(res)
     //setStream(avatarRef.current.mediaStream)
     
     await avatar.current?.startVoiceChat();
-    await avatar.current.speak({ text: "introduce yourself." }).catch((e) => {
+    await avatar.current.speak({ text: "can you tell me about some insurance policies." }).catch((e) => {
       setDebug(e.message);
     });
     setSessionState("running")
