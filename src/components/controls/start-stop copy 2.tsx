@@ -148,7 +148,7 @@ export function StartStop() {
     //setStream(avatarRef.current.mediaStream)
     
     await avatar.current?.startVoiceChat();
-    await avatar.current.speak({ text: "hi, can you tell me about some insurance policies you have?" }).catch((e) => {
+    await avatar.current.speak({ text: "can you tell me about some insurance policies." }).catch((e) => {
       setDebug(e.message);
     });
     setSessionState("running")
