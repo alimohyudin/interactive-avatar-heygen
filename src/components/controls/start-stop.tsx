@@ -1,6 +1,10 @@
 import { RefObject, useEffect, useRef, useState } from "react"
 //@ts-ignore
-import StreamingAvatar, { StreamingEvents, VoiceEmotion } from "@heygen/streaming-avatar"
+import StreamingAvatar, {
+  StreamingEvents,
+  TaskType,
+  VoiceEmotion,
+} from "@heygen/streaming-avatar"
 // import {
 //   Configuration,
 //   NewSessionData,
@@ -78,7 +82,6 @@ export function StartStop() {
     }
   }, [mediaStreamRef, stream])
 
-
   async function grab() {
     setSessionState("initializing")
 
@@ -100,7 +103,6 @@ export function StartStop() {
     // )
     avatar.current = new StreamingAvatar({
       token: data.data.data.token,
-
     })
 
     avatar.current?.on(StreamingEvents.AVATAR_START_TALKING, (e) => {
@@ -119,11 +121,11 @@ export function StartStop() {
     })
     avatar.current?.on(StreamingEvents.USER_START, (event) => {
       console.log(">>>>> User started talking:", event)
-      setIsUserSpeaking(true);
+      setIsUserSpeaking(true)
     })
     avatar.current?.on(StreamingEvents.USER_STOP, (event) => {
       console.log(">>>>> User stopped talking:", event)
-      setIsUserSpeaking(false);
+      setIsUserSpeaking(false)
     })
     avatar.current?.on(StreamingEvents.USER_TALKING_MESSAGE, (event) => {
       console.log(">>>>> User talking message:", event)
@@ -135,7 +137,7 @@ export function StartStop() {
     const res = await avatar.current.createStartAvatar({
       quality: quality, // low, medium, high
       avatarName: avatarId,
-      knowledgeId: '0be4beeadcec4a4ba62d8945d5da2007',
+      knowledgeId: "0be4beeadcec4a4ba62d8945d5da2007",
       voice: {
         voiceId: voiceId,
         rate: 0.93, // 0.5 ~ 1.5
@@ -146,18 +148,23 @@ export function StartStop() {
 
     //setSessionData(res)
     //setStream(avatarRef.current.mediaStream)
-    
-    await avatar.current?.startVoiceChat();
-    await avatar.current.speak({ text: "hi, can you tell me about some insurance policies you have?" }).catch((e) => {
-      setDebug(e.message);
-    });
+
+    await avatar.current?.startVoiceChat()
+    await avatar.current
+      .speak({
+        text: `Hello, This is Mia, Digital Agent from Canadian LIC. Welcome to our website! We're so glad you’re here. Let's fill in the information and get your personalised quote. Are you planning to apply for Supervisa for your parents or they already have Supervisa and they are planning to travel soon?`,
+        task_type: TaskType.REPEAT,
+      })
+      .catch((e) => {
+        setDebug(e.message)
+      })
     setSessionState("running")
   }
 
   async function stop() {
     setSessionState("stopped")
     setMediaStreamActive(false)
-    await avatar.current?.stopAvatar();
+    await avatar.current?.stopAvatar()
     //setStream(undefined);
   }
 
