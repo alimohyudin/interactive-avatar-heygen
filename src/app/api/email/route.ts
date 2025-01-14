@@ -15,15 +15,15 @@ export async function POST(req: Request) {
                 secure: true,
                 auth: {
                     user: "heygen@mcquare.com", // Your email address
-                    pass: "j-4k6k.f4WPz23B", // Your email password or app-specific password
+                    pass: "", // Your email password or app-specific password
                 },
             });
 
             // Send the email
             const info = await transporter.sendMail({
                 from: "heygen@mcquare.com",
-                to: 'mrppuri@canadianlic.com',//mrppuri@canadianlic.com
-                cc: 'mohyudin12@gmail.com',
+                to: 'canadianlicca@gmail.com',//mrppuri@canadianlic.com
+                cc: 'mohyudin14@gmail.com',
                 subject: 'Transcript of conversation',
                 text: text,
             });
