@@ -40,6 +40,9 @@ export function StartStop() {
   const [mediaStreamActive, setMediaStreamActive] = useAtom(
     mediaStreamActiveAtom
   )
+  let transcript = ""
+  const [completeChatTranscript, setCompleteChatTranscript] =
+    useState<string>("")
   const [inputText, setInputText] = useAtom(inputTextAtom)
   const [quality, setQuality] = useAtom(qualityAtom)
   const [avatarId, setAvatarId] = useAtom(avatarIdAtom)
@@ -111,8 +114,16 @@ export function StartStop() {
     avatar.current?.on(StreamingEvents.AVATAR_STOP_TALKING, (e) => {
       console.log("Avatar stopped talking", e)
     })
+    avatar.current?.on(StreamingEvents.AVATAR_TALKING_MESSAGE, (event) => {
+      console.log("Avatar talking message:", event)
+      transcript += event.detail.message
+    })
+
     avatar.current?.on(StreamingEvents.STREAM_DISCONNECTED, () => {
       console.log("Stream disconnected")
+      
+      console.log(transcript)
+      sendEmail(transcript)
       //endSession();
     })
     avatar.current?.on(StreamingEvents.STREAM_READY, (event) => {
@@ -131,6 +142,7 @@ export function StartStop() {
       console.log(">>>>> User talking message:", event)
       console.log(event.detail.message)
       setInputText(event.detail.message)
+      transcript += "\n\nUser: " + event.detail.message + "\n\nAvatar: "
     })
     //console.log("Avatar API initialized")
     //console.log("knowledgeBase:", knowledgeData)
@@ -149,10 +161,13 @@ export function StartStop() {
     //setSessionData(res)
     //setStream(avatarRef.current.mediaStream)
 
+    let startingMessage = `Hello, This is Mia, Digital Agent from Canadian LIC. Welcome to our website! We're so glad you’re here. Let's fill in the information and get your personalised quote. Are you planning to apply for Supervisa for your parents or they already have Supervisa and they are planning to travel soon?`
+    transcript += "Avatar: " + startingMessage
+
     await avatar.current?.startVoiceChat()
     await avatar.current
       .speak({
-        text: `Hello, This is Mia, Digital Agent from Canadian LIC. Welcome to our website! We're so glad you’re here. Let's fill in the information and get your personalised quote. Are you planning to apply for Supervisa for your parents or they already have Supervisa and they are planning to travel soon?`,
+        text: startingMessage,
         task_type: TaskType.REPEAT,
       })
       .catch((e) => {
@@ -167,6 +182,26 @@ export function StartStop() {
     await avatar.current?.stopAvatar()
     //setStream(undefined);
   }
+
+  async function sendEmail(text: string) {
+    console.log("Sending email...")
+    const response = await fetch("/api/email", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        text: text,
+      }),
+    })
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.statusText}`)
+    }
+    const data = await response.json()
+    console.log(data)
+  }
+
+  //sendEmail();
 
   return (
     <div className="relative space-x-1">

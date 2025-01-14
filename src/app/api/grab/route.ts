@@ -16,7 +16,9 @@ export async function POST() {
         },
         body: JSON.stringify({}),
       }
+      
     )
+    console.log("hello world");
 
     if (!response.ok) {
       throw new Error(`Failed to fetch: ${response.statusText}`)
